@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // Article model
@@ -28,10 +30,17 @@ func getArticles(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(articles)
 }
 
+func testPostArticles(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Test post article")
+}
+
 func handleRequests() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/articles", getArticles)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	myRouter := mux.NewRouter().StrictSlash(true)
+
+	myRouter.HandleFunc("/", homePage).Methods("GET")
+	myRouter.HandleFunc("/articles", getArticles).Methods("GET")
+	myRouter.HandleFunc("/articles", testPostArticles).Methods("POST")
+	log.Fatal(http.ListenAndServe(":8081", myRouter))
 }
 
 func main() {
